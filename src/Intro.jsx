@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { GAME } from "./config.js";
+import useMeta from "./useMeta.js";
 
 export default function Intro({ onDone }) {
+  const meta = useMeta();
+  const GAME = (meta && meta.settings) || {};
   const [phase, setPhase] = useState(0);
 
   useEffect(() => {
