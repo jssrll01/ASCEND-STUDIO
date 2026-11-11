@@ -174,3 +174,12 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;color:var(--txt
 .olrow small{margin-left:auto;color:var(--dim);font-size:13px}
 .olrow.me{color:var(--gold)}
 .dot{width:9px;height:9px;border-radius:50%;background:var(--good);box-shadow:0 0 8px var(--good);flex:none}
+
+/* IDENTITY: let the background photo show through */
+.id-shade{background:radial-gradient(ellipse at center,rgba(4,6,12,.12),rgba(4,6,12,.5))}
+.id-panel{background:rgba(9,13,23,.38);-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px)}
+.id-panel header p,.id-panel .field label,.id-panel .agree{text-shadow:0 1px 4px rgba(0,0,0,.9)}
+.id-panel .field input,.id-panel .field select,.id-panel .field textarea{background:rgba(6,9,16,.5)}
+.id-panel .field input:focus,.id-panel .field select:focus,.id-panel .field textarea:focus{background:rgba(232,194,106,.14)}
+.chips .chip:not(.on){background:rgba(6,9,16,.5)}
+.id-err{margin:2px 0 8px;font-size:16px;letter-spacing:1px;color:var(--bad)}

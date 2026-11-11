@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import { GAME, HOME_BG } from "./config.js";
 import { GoogleG } from "./icons.jsx";
 
-export default function Title({ user, busy, onLogin, onStart, onLogout }) {
+export default function Title({ user, busy, error, onLogin, onStart, onLogout }) {
   const parts = useMemo(
     () => Array.from({ length: 26 }, () => ({ l: Math.random() * 100, d: 6 + Math.random() * 8, dl: Math.random() * 8, s: 2 + Math.random() * 3 })),
     []
@@ -31,7 +31,7 @@ export default function Title({ user, busy, onLogin, onStart, onLogout }) {
             <button className="btn-google" onClick={onLogin} disabled={busy}>
               <GoogleG />{busy ? "Connecting…" : "Continue with Google"}
             </button>
-            <div className="hint">Test mode · no database connected</div>
+            <div className="hint">{error || "Sign in to save your progress"}</div>
           </>
         ) : (
           <>

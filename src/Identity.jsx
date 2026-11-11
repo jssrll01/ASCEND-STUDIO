@@ -1,20 +1,35 @@
 import React, { useState } from "react";
 import { IDENTITY_BG, GENDERS, COUNTRIES, GOALS } from "./config.js";
 
+const NAME_RX = /^[A-Za-z][A-Za-z '\-]{1,23}$/;
+
+// Defined at module level on purpose: a component created inside another component is a new
+// type on every keystroke, which rebuilds the inputs and closes the keyboard.
+function Field({ label, msg, children }) {
+  return (
+    <div className={"field" + (msg ? " bad" : "")}>
+      <label>{label}</label>
+      {children}
+      {msg && <em>{msg}</em>}
+    </div>
+  );
+}
+
 export default function Identity({ onCreate }) {
   const [f, setF] = useState({
     username: "", first: "", last: "", age: "", gender: "", country: "",
     city: "", goal: "", career: "", bio: "", agree: false,
   });
   const [tried, setTried] = useState(false);
-  const set = (k, v) => setF((o) => ({ ...o, [k]: v }));
+  const [saving, setSaving] = useState(false);
+  const [srvErr, setSrvErr] = useState("");
+  const set = (k, v) => { setSrvErr(""); setF((o) => ({ ...o, [k]: v })); };
 
   const age = parseInt(f.age, 10);
-  const nameRx = /^[A-Za-z][A-Za-z '\-]{1,23}$/;
   const err = {
     username: /^[A-Za-z0-9_]{3,16}$/.test(f.username) ? "" : "3-16 letters, numbers or _",
-    first: nameRx.test(f.first.trim()) ? "" : "Enter a valid first name",
-    last: nameRx.test(f.last.trim()) ? "" : "Enter a valid last name",
+    first: NAME_RX.test(f.first.trim()) ? "" : "Enter a valid first name",
+    last: NAME_RX.test(f.last.trim()) ? "" : "Enter a valid last name",
     age: isNaN(age) ? "Enter your age" : age < 18 ? "You must be 18 years old or above" : age > 99 ? "Enter a valid age" : "",
     gender: f.gender ? "" : "Select one",
     country: f.country ? "" : "Select your country",
@@ -23,26 +38,22 @@ export default function Identity({ onCreate }) {
     agree: f.agree ? "" : "You must accept the terms",
   };
   const ok = Object.values(err).every((e) => !e);
-  const show = (k) => (tried || (k === "age" && f.age !== "")) && err[k];
+  const msg = (k) => ((tried || (k === "age" && f.age !== "")) && err[k]) || "";
 
-  const submit = (e) => {
+  const submit = async (e) => {
     e.preventDefault();
+    if (saving) return;
     setTried(true);
     if (!ok) return;
-    onCreate({
+    setSaving(true);
+    setSrvErr("");
+    const problem = await onCreate({
       username: f.username.trim(), first: f.first.trim(), last: f.last.trim(), age,
       gender: f.gender, country: f.country, city: f.city.trim(), goal: f.goal,
-      career: f.career.trim(), bio: f.bio.trim(), createdAt: new Date().toISOString(),
+      career: f.career.trim(), bio: f.bio.trim(),
     });
+    if (problem) { setSrvErr(problem); setSaving(false); }
   };
-
-  const Field = ({ k, label, children }) => (
-    <div className={"field" + (show(k) ? " bad" : "")}>
-      <label>{label}</label>
-      {children}
-      {show(k) && <em>{err[k]}</em>}
-    </div>
-  );
 
   return (
     <div className="screen identity" style={{ backgroundImage: `url(${IDENTITY_BG})` }}>
@@ -56,18 +67,18 @@ export default function Identity({ onCreate }) {
 
         <div className="id-grid">
           <div className="col">
-            <Field k="username" label="USERNAME (PUBLIC)">
+            <Field label="USERNAME (PUBLIC)" msg={msg("username")}>
               <div className="prefix"><span>@</span>
-                <input maxLength={16} value={f.username} onChange={(e) => set("username", e.target.value)} placeholder="your_username" autoCapitalize="off" />
+                <input maxLength={16} value={f.username} onChange={(e) => set("username", e.target.value)} placeholder="your_username" autoCapitalize="off" autoComplete="off" autoCorrect="off" />
               </div>
             </Field>
             <div className="two">
-              <Field k="first" label="FIRST NAME"><input maxLength={24} value={f.first} onChange={(e) => set("first", e.target.value)} placeholder="Juan" /></Field>
-              <Field k="last" label="LAST NAME"><input maxLength={24} value={f.last} onChange={(e) => set("last", e.target.value)} placeholder="Dela Cruz" /></Field>
+              <Field label="FIRST NAME" msg={msg("first")}><input maxLength={24} value={f.first} onChange={(e) => set("first", e.target.value)} placeholder="Juan" /></Field>
+              <Field label="LAST NAME" msg={msg("last")}><input maxLength={24} value={f.last} onChange={(e) => set("last", e.target.value)} placeholder="Dela Cruz" /></Field>
             </div>
             <div className="two">
-              <Field k="age" label="AGE (18+)"><input type="number" inputMode="numeric" min="18" max="99" value={f.age} onChange={(e) => set("age", e.target.value)} placeholder="18" /></Field>
-              <Field k="gender" label="GENDER">
+              <Field label="AGE (18+)" msg={msg("age")}><input type="number" inputMode="numeric" min="18" max="99" value={f.age} onChange={(e) => set("age", e.target.value)} placeholder="18+" /></Field>
+              <Field label="GENDER" msg={msg("gender")}>
                 <select value={f.gender} onChange={(e) => set("gender", e.target.value)}>
                   <option value="">Select</option>
                   {GENDERS.map((g) => <option key={g}>{g}</option>)}
@@ -75,39 +86,41 @@ export default function Identity({ onCreate }) {
               </Field>
             </div>
             <div className="two">
-              <Field k="country" label="COUNTRY">
+              <Field label="COUNTRY" msg={msg("country")}>
                 <select value={f.country} onChange={(e) => set("country", e.target.value)}>
                   <option value="">Select</option>
                   {COUNTRIES.map((g) => <option key={g}>{g}</option>)}
                 </select>
               </Field>
-              <Field k="city" label="STARTING CITY"><input maxLength={30} value={f.city} onChange={(e) => set("city", e.target.value)} placeholder="Manila" /></Field>
+              <Field label="STARTING CITY" msg={msg("city")}><input maxLength={30} value={f.city} onChange={(e) => set("city", e.target.value)} placeholder="Manila" /></Field>
             </div>
           </div>
 
           <div className="col">
-            <Field k="goal" label="LIFE GOAL">
+            <Field label="LIFE GOAL" msg={msg("goal")}>
               <div className="chips">
                 {GOALS.map((g) => (
                   <div key={g} className={"chip" + (f.goal === g ? " on" : "")} onClick={() => set("goal", g)}>{g}</div>
                 ))}
               </div>
             </Field>
-            <Field k="career" label="DREAM CAREER (OPTIONAL)">
+            <Field label="DREAM CAREER (OPTIONAL)" msg="">
               <input maxLength={30} value={f.career} onChange={(e) => set("career", e.target.value)} placeholder="Game developer, Doctor, Chef..." />
             </Field>
-            <Field k="bio" label={`BIO / MOTTO (OPTIONAL) ${f.bio.length}/120`}>
+            <Field label={`BIO / MOTTO (OPTIONAL) ${f.bio.length}/120`} msg="">
               <textarea maxLength={120} value={f.bio} onChange={(e) => set("bio", e.target.value)} placeholder="Tell the world who you are..." />
             </Field>
           </div>
         </div>
+
+        {srvErr && <div className="id-err" role="alert">{srvErr}</div>}
 
         <footer>
           <div className={"agree" + (tried && err.agree ? " bad" : "")} onClick={() => set("agree", !f.agree)}>
             <i className={f.agree ? "on" : ""}>{f.agree ? "✓" : ""}</i>
             I am 18+ and accept the ASCEND terms
           </div>
-          <button type="submit" className="btn-start small">CONFIRM IDENTITY</button>
+          <button type="submit" className="btn-start small" disabled={saving}>{saving ? "SAVING…" : "CONFIRM IDENTITY"}</button>
         </footer>
       </form>
     </div>
