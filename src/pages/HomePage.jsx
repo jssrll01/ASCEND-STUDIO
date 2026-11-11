@@ -1,90 +1,31 @@
-import React, { useEffect, useState } from "react";
-import { I } from "../icons.jsx";
-import useMeta from "../useMeta.js";
-import { loadNews } from "../api.js";
+import React from "react";
 
-const MISSIONS = [
-  { id: "identity", t: "Create your identity", r: "+100 Gold" },
-  { id: "hello", t: "Say hello in Global Chat", r: "+50 Gold" },
-  { id: "daily", t: "Check the Home page daily", r: "+20 Gems", claim: true },
-];
-const TEST_MODE = import.meta.env.VITE_TEST_MODE === "1";
+const fmt = (n) => Number(n || 0).toLocaleString("en-US");
 
-export default function HomePage({ profile, missions, toast, onResetId, onClaim }) {
-  const [news, setNews] = useState([]);
-  const [busy, setBusy] = useState(false);
-  const meta = useMeta();
-  const done = missions || {};
-
-  useEffect(() => {
-    let alive = true;
-    loadNews()
-      .then((rows) => { if (alive && rows.length) setNews(rows.map((n) => ({ tag: n.tag, title: n.title, date: n.date_label }))); })
-      .catch(() => {});
-    return () => { alive = false; };
-  }, []);
-
-  const claim = async () => {
-    if (busy) return;
-    setBusy(true);
-    const err = await onClaim();
-    setBusy(false);
-    toast(err || "+20 Gems claimed");
-  };
-
+export default function HomePage({ profile }) {
+  const xp = Number(profile.xp || 0);
+  const level = 1 + Math.floor(xp / 100);
   return (
-    <div className="hp" style={meta && meta.assets.home_bg ? { backgroundImage: `url(${meta.assets.home_bg})` } : undefined}>
-      <div className="hp-shade" />
-
-      <div className="panel pcard">
-        <div className="ph">PLAYER CARD</div>
-        <div className="pc-name">@{profile.username}</div>
-        <div className="pc-real">{profile.first} {profile.last}</div>
-        <div className="pc-row"><span>Age</span><b>{profile.age}</b></div>
-        <div className="pc-row"><span>Location</span><b>{profile.city}, {profile.country}</b></div>
-        <div className="pc-row"><span>Life goal</span><b>{profile.goal}</b></div>
-        {profile.career && <div className="pc-row"><span>Dream career</span><b>{profile.career}</b></div>}
-        {profile.bio && <div className="pc-bio">“{profile.bio}”</div>}
-        {TEST_MODE && <a className="pc-reset" onClick={onResetId}>Reset identity (test)</a>}
-      </div>
-
-      <div className="hero">
-        <div className="season">SEASON 1</div>
-        <h2>AWAKENING</h2>
-        <p>Build your life. Rise beyond reality.</p>
-        <button className="btn-start" onClick={() => toast("World mode is coming soon")}>
-          <span className="pi">{I.play}</span>ENTER WORLD
-        </button>
-      </div>
-
-      <div className="rcol">
-        <div className="panel">
-          <div className="ph">NEWS</div>
-          {news.map((n) => (
-            <div className="news" key={n.title}>
-              <em className={n.tag}>{n.tag}</em>
-              <span>{n.title}</span>
-              <small>{n.date}</small>
-            </div>
-          ))}
+    <div className="m-home">
+      <section className="m-card m-profile">
+        <div className="m-avatar">{profile.username[0].toUpperCase()}</div>
+        <div className="m-pinfo">
+          <h2>@{profile.username}</h2>
+          <p>{profile.first} {profile.last}</p>
+          <div className="m-lv"><small>LEVEL {level}</small><div className="m-bar"><i style={{ width: (xp % 100) + "%" }} /></div></div>
         </div>
-        <div className="panel">
-          <div className="ph">DAILY MISSIONS</div>
-          {MISSIONS.map((m) => {
-            const isDone = !!done[m.id];
-            const canClaim = m.claim && !isDone;
-            return (
-              <div className={"mission" + (isDone ? " done" : "")} key={m.id}
-                onClick={canClaim ? claim : undefined} role={canClaim ? "button" : undefined}
-                style={canClaim ? { cursor: "pointer" } : undefined}>
-                <i>{isDone && I.check}</i>
-                <span>{m.t}</span>
-                <b>{canClaim ? (busy ? "…" : "CLAIM · " + m.r) : m.r}</b>
-              </div>
-            );
-          })}
-        </div>
-      </div>
+        <dl className="m-facts">
+          <div><dt>Age</dt><dd>{profile.age}</dd></div>
+          <div><dt>Location</dt><dd>{profile.city}, {profile.country}</dd></div>
+          <div><dt>Life goal</dt><dd>{profile.goal}</dd></div>
+        </dl>
+      </section>
+
+      <section className="m-stats">
+        <div className="m-card m-stat"><small>CASH</small><b>{profile.energy} <em>/ {profile.energy_max}</em></b></div>
+        <div className="m-card m-stat gold"><small>GOLD</small><b>{fmt(profile.gold)}</b></div>
+        <div className="m-card m-stat gem"><small>DIAMONDS</small><b>{fmt(profile.gems)}</b></div>
+      </section>
     </div>
   );
 }
