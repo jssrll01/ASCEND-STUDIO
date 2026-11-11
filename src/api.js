@@ -40,11 +40,11 @@ export const signOut = () => supabase.auth.signOut();
 
 export async function loadMeta() {
   const [co, ci, op, as, st] = await Promise.all([
+    supabase.from("asc_settings").select("key,value"),
     supabase.from("asc_countries").select("name").order("sort"),
     supabase.from("asc_cities").select("country,name,is_main").order("sort"),
     supabase.from("asc_options").select("kind,label").order("sort"),
     supabase.from("asc_assets").select("key,url"),
-    supabase.from("asc_settings").select("key,value"),
   ]);
   const bad = [co, ci, op, as, st].find((r) => r.error);
   if (bad) throw new Error(bad.error.message);
