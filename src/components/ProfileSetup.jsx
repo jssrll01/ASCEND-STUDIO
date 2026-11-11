@@ -1,12 +1,14 @@
 import { useState } from 'react'
 import { supabase } from '../supabase'
 import { CITIES, GENDERS, COUNTRY } from '../constants'
+import Dropdown from './Dropdown.jsx'
 
 export default function ProfileSetup({ user, onDone }) {
   const [f, setF] = useState({ username: '', first_name: '', last_name: '', gender: '', city: '', age: '' })
   const [err, setErr] = useState('')
   const [busy, setBusy] = useState(false)
   const set = (k) => (e) => setF({ ...f, [k]: e.target.value })
+  const pick = (k) => (v) => setF({ ...f, [k]: v })
 
   async function submit(e) {
     e.preventDefault()
@@ -46,21 +48,9 @@ export default function ProfileSetup({ user, onDone }) {
         <label>Username<input value={f.username} onChange={set('username')} maxLength={16} autoCapitalize="none" autoComplete="off" /></label>
         <label>First name<input value={f.first_name} onChange={set('first_name')} maxLength={40} /></label>
         <label>Last name<input value={f.last_name} onChange={set('last_name')} maxLength={40} /></label>
-        <label>Gender
-          <select value={f.gender} onChange={set('gender')}>
-            <option value="">Select…</option>
-            {GENDERS.map((g) => <option key={g}>{g}</option>)}
-          </select>
-        </label>
-        <label>Country
-          <select value={COUNTRY} disabled><option>{COUNTRY}</option></select>
-        </label>
-        <label>City
-          <select value={f.city} onChange={set('city')}>
-            <option value="">Select…</option>
-            {CITIES.map((c) => <option key={c}>{c}</option>)}
-          </select>
-        </label>
+        <Dropdown label="Gender" value={f.gender} options={GENDERS} onChange={pick('gender')} />
+        <Dropdown label="Country" value={COUNTRY} options={[COUNTRY]} onChange={() => {}} disabled />
+        <Dropdown label="City" value={f.city} options={CITIES} onChange={pick('city')} />
         <label>Age<input type="number" inputMode="numeric" min="18" max="120" value={f.age} onChange={set('age')} /></label>
         {err && <p className="err">{err}</p>}
         <button className="btn" disabled={busy}>{busy ? 'Saving…' : 'Enter the world'}</button>
