@@ -11,7 +11,7 @@ const returningFromLogin = () => /[?&]code=|access_token=/.test(window.location.
 const EMPTY = { player: null, missions: {} };
 
 export default function App() {
-  const { s, rot } = useStage();
+  const { s, rot, w, h } = useStage();
   const [screen, setScreen] = useState(() => (returningFromLogin() ? "title" : "intro"));
   const [user, setUser] = useState(null);
   const [state, setState] = useState(EMPTY);
@@ -93,7 +93,7 @@ export default function App() {
   const transform = `translate(-50%,-50%) ${rot ? "rotate(90deg) " : ""}scale(${s})`;
 
   return (
-    <div className="stage" style={{ transform }}>
+    <div className="stage" style={{ transform, width: w, height: h }}>
       {screen === "intro" && <Intro onDone={() => setScreen("title")} />}
       {screen === "title" && <Title user={user} busy={busy || !ready} error={error} onLogin={login} onStart={start} onLogout={logout} />}
       {screen === "identity" && user && <Identity onCreate={createId} />}

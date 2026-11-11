@@ -210,3 +210,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;color:var(--txt
 .id-panel .field input:focus,.id-panel .field select:focus,.id-panel .field textarea:focus{background:rgba(232,194,106,.14)}
 .chips .chip:not(.on){background:rgba(6,9,16,.5)}
 .id-err{margin:2px 0 8px;font-size:16px;letter-spacing:1px;color:var(--bad)}
+
+/* fill the whole screen, no side bars */
+.stage > .screen{width:100%;height:100%}

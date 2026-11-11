@@ -7,7 +7,7 @@ const editing = () => {
 
 // Fixed 1280x720 stage, scaled to fit, rotated to landscape when phone is upright.
 export default function useStage() {
-  const [st, setSt] = useState({ s: 1, rot: false });
+  const [st, setSt] = useState({ s: 1, rot: false, w: 1280, h: 720 });
 
   useEffect(() => {
     const f = () => {
@@ -16,8 +16,9 @@ export default function useStage() {
       const w = window.innerWidth, h = window.innerHeight;
       const portrait = h > w;
       const W = portrait ? h : w, H = portrait ? w : h;
-      const next = { s: Math.min(W / 1280, H / 720), rot: portrait };
-      setSt((o) => (o.s === next.s && o.rot === next.rot ? o : next));
+      const sc = Math.min(W / 1280, H / 720);
+      const next = { s: sc, rot: portrait, w: Math.round(W / sc), h: Math.round(H / sc) };
+      setSt((o) => (o.s === next.s && o.rot === next.rot && o.w === next.w && o.h === next.h ? o : next));
     };
     const later = () => setTimeout(f, 350);
     f();
