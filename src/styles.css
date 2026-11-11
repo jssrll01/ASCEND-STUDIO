@@ -54,3 +54,12 @@ input:focus,select:focus{outline:none;border-color:var(--red)}
 .count{position:absolute;right:92px;bottom:2px;font-size:9px;color:var(--dim)}
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;padding:20px;z-index:50}
 @media (prefers-reduced-motion:reduce){.glitch::before,.glitch::after{animation:none}.fade{animation-duration:.01s}}
+.field{position:relative;display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--dim);letter-spacing:.1em}
+.dd-btn{display:flex;justify-content:space-between;align-items:center;background:#000;border:1px solid var(--line);color:var(--text);padding:11px;font-size:16px;text-align:left;width:100%;border-radius:0}
+.dd-btn.open{border-color:var(--red)}
+.dd-btn:disabled{opacity:.6}
+.dd-arrow{color:var(--red2)}
+.dd-list{position:absolute;top:100%;left:0;right:0;z-index:20;max-height:220px;overflow-y:auto;list-style:none;background:var(--panel);border:1px solid var(--red);box-shadow:0 8px 24px rgba(0,0,0,.7)}
+.dd-list li{padding:12px;font-size:16px;color:var(--text);letter-spacing:normal;border-bottom:1px solid var(--line);cursor:pointer}
+.dd-list li:last-child{border-bottom:0}
+.dd-list li:hover,.dd-list li.sel{background:var(--red);color:#fff}
