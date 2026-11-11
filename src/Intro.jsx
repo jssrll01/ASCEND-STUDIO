@@ -25,7 +25,7 @@ export default function Intro({ onDone }) {
       {phase === 2 && (
         <>
           <div className="ititle">
-            {GAME.name.split("").map((c, i) => (
+            {(GAME.name || "").split("").map((c, i) => (
               <span key={i} style={{ animationDelay: i * 0.12 + "s" }}>{c}</span>
             ))}
           </div>
