@@ -1,5 +1,6 @@
-import React, { useState } from "react";
-import { IDENTITY_BG, GENDERS, COUNTRIES, GOALS } from "./config.js";
+import React, { useEffect, useState } from "react";
+import useMeta from "./useMeta.js";
+import Select from "./Select.jsx";
 
 const NAME_RX = /^[A-Za-z][A-Za-z '\-]{1,23}$/;
 
@@ -24,6 +25,18 @@ export default function Identity({ onCreate }) {
   const [saving, setSaving] = useState(false);
   const [srvErr, setSrvErr] = useState("");
   const set = (k, v) => { setSrvErr(""); setF((o) => ({ ...o, [k]: v })); };
+  const meta = useMeta();
+  // Default to the first country and its main city once the data arrives
+  useEffect(() => {
+    if (!meta) return;
+    setF((o) => {
+      if (o.country) return o;
+      const c = meta.countries[0] || "";
+      const m = meta.cities.find((x) => x.country === c && x.is_main);
+      return { ...o, country: c, city: m ? m.name : "" };
+    });
+  }, [meta]);
+  const cityList = meta ? meta.cities.filter((c) => c.country === f.country).map((c) => c.name) : [];
 
   const age = parseInt(f.age, 10);
   const err = {
@@ -56,7 +69,7 @@ export default function Identity({ onCreate }) {
   };
 
   return (
-    <div className="screen identity" style={{ backgroundImage: `url(${IDENTITY_BG})` }}>
+    <div className="screen identity" style={meta && meta.assets.identity_bg ? { backgroundImage: `url(${meta.assets.identity_bg})` } : undefined}>
       <div className="id-shade" />
       <form className="id-panel" onSubmit={submit} noValidate>
         <header>
@@ -73,33 +86,27 @@ export default function Identity({ onCreate }) {
               </div>
             </Field>
             <div className="two">
-              <Field label="FIRST NAME" msg={msg("first")}><input maxLength={24} value={f.first} onChange={(e) => set("first", e.target.value)} placeholder="Juan" /></Field>
-              <Field label="LAST NAME" msg={msg("last")}><input maxLength={24} value={f.last} onChange={(e) => set("last", e.target.value)} placeholder="Dela Cruz" /></Field>
+              <Field label="FIRST NAME" msg={msg("first")}><input maxLength={24} value={f.first} onChange={(e) => set("first", e.target.value)} placeholder="First name" /></Field>
+              <Field label="LAST NAME" msg={msg("last")}><input maxLength={24} value={f.last} onChange={(e) => set("last", e.target.value)} placeholder="Last name" /></Field>
             </div>
             <div className="two">
               <Field label="AGE (18+)" msg={msg("age")}><input type="number" inputMode="numeric" min="18" max="99" value={f.age} onChange={(e) => set("age", e.target.value)} placeholder="18+" /></Field>
               <Field label="GENDER" msg={msg("gender")}>
-                <select value={f.gender} onChange={(e) => set("gender", e.target.value)}>
-                  <option value="">Select</option>
-                  {GENDERS.map((g) => <option key={g}>{g}</option>)}
-                </select>
+                <Select value={f.gender} onChange={(v) => set("gender", v)} options={meta ? meta.genders : []} />
               </Field>
             </div>
             <div className="two">
               <Field label="COUNTRY" msg={msg("country")}>
-                <select value={f.country} onChange={(e) => set("country", e.target.value)}>
-                  <option value="">Select</option>
-                  {COUNTRIES.map((g) => <option key={g}>{g}</option>)}
-                </select>
+                <Select up value={f.country} onChange={(v) => setF((o) => ({ ...o, country: v, city: "" }))} options={meta ? meta.countries : []} />
               </Field>
-              <Field label="STARTING CITY" msg={msg("city")}><input maxLength={30} value={f.city} onChange={(e) => set("city", e.target.value)} placeholder="Manila" /></Field>
+              <Field label="STARTING CITY" msg={msg("city")}><Select up value={f.city} onChange={(v) => set("city", v)} options={cityList} placeholder="Select city" disabled={!f.country} /></Field>
             </div>
           </div>
 
           <div className="col">
             <Field label="LIFE GOAL" msg={msg("goal")}>
               <div className="chips">
-                {GOALS.map((g) => (
+                {(meta ? meta.goals : []).map((g) => (
                   <div key={g} className={"chip" + (f.goal === g ? " on" : "")} onClick={() => set("goal", g)}>{g}</div>
                 ))}
               </div>

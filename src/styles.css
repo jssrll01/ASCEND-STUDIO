@@ -213,3 +213,16 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;color:var(--txt
 
 /* fill the whole screen, no side bars */
 .stage > .screen{width:100%;height:100%}
+
+/* custom dropdown */
+.dd{position:relative}
+.dd-btn{width:100%;height:36px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;font:inherit;color:inherit;text-align:left;background:rgba(6,9,16,.5);border:1px solid rgba(232,194,106,.28);cursor:pointer}
+.dd.open .dd-btn,.dd-btn:focus{border-color:#e8c26a;background:rgba(232,194,106,.14)}
+.dd-btn:disabled{opacity:.5}
+.dd-ph{opacity:.5}
+.dd-arrow{width:7px;height:7px;border-right:2px solid #e8c26a;border-bottom:2px solid #e8c26a;transform:rotate(45deg);margin-top:-3px}
+.dd.open .dd-arrow{transform:rotate(-135deg);margin-top:3px}
+.dd-list{position:absolute;left:0;right:0;top:100%;z-index:50;max-height:190px;overflow-y:auto;-webkit-overflow-scrolling:touch;background:rgba(9,13,23,.97);border:1px solid #e8c26a}
+.dd.up .dd-list{top:auto;bottom:100%}
+.dd-opt{padding:9px 12px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.06)}
+.dd-opt.on{background:#e8c26a;color:#111}

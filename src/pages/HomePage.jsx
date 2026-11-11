@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { I } from "../icons.jsx";
-import { HOME_BG, NEWS as FALLBACK_NEWS } from "../config.js";
+import useMeta from "../useMeta.js";
 import { loadNews } from "../api.js";
 
 const MISSIONS = [
@@ -11,8 +11,9 @@ const MISSIONS = [
 const TEST_MODE = import.meta.env.VITE_TEST_MODE === "1";
 
 export default function HomePage({ profile, missions, toast, onResetId, onClaim }) {
-  const [news, setNews] = useState(FALLBACK_NEWS);
+  const [news, setNews] = useState([]);
   const [busy, setBusy] = useState(false);
+  const meta = useMeta();
   const done = missions || {};
 
   useEffect(() => {
@@ -32,7 +33,7 @@ export default function HomePage({ profile, missions, toast, onResetId, onClaim 
   };
 
   return (
-    <div className="hp" style={{ backgroundImage: `url(${HOME_BG})` }}>
+    <div className="hp" style={meta && meta.assets.home_bg ? { backgroundImage: `url(${meta.assets.home_bg})` } : undefined}>
       <div className="hp-shade" />
 
       <div className="panel pcard">

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { I } from "./icons.jsx";
-import { GAME } from "./config.js";
+import useMeta from "./useMeta.js";
 import useChat from "./useChat.js";
 import HomePage from "./pages/HomePage.jsx";
 import ChatPage from "./pages/ChatPage.jsx";
@@ -14,6 +14,7 @@ const fmt = (n) => Number(n || 0).toLocaleString("en-US");
 
 export default function Shell({ profile, missions, onLogout, onResetId, onClaim, onRefresh }) {
   const [page, setPage] = useState("home");
+  const meta = useMeta();
   const [toast, setToast] = useState(null);
   const showToast = (m) => { setToast(m); setTimeout(() => setToast(null), 2200); };
 
@@ -27,7 +28,7 @@ export default function Shell({ profile, missions, onLogout, onResetId, onClaim,
   return (
     <div className="screen shell">
       <div className="hud">
-        <div className="hud-logo">{GAME.name}</div>
+        <div className="hud-logo">{meta && meta.settings.name}</div>
         <div className="player">
           <div className="pav">{profile.username[0].toUpperCase()}</div>
           <div className="pinfo">

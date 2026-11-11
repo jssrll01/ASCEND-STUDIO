@@ -37,3 +37,24 @@ export async function signInGoogle() {
 }
 
 export const signOut = () => supabase.auth.signOut();
+
+export async function loadMeta() {
+  const [co, ci, op, as, st] = await Promise.all([
+    supabase.from("asc_settings").select("key,value"),
+    supabase.from("asc_countries").select("name").order("sort"),
+    supabase.from("asc_cities").select("country,name,is_main").order("sort"),
+    supabase.from("asc_options").select("kind,label").order("sort"),
+    supabase.from("asc_assets").select("key,url"),
+  ]);
+  const bad = [co, ci, op, as, st].find((r) => r.error);
+  if (bad) throw new Error(bad.error.message);
+  const kind = (k) => op.data.filter((o) => o.kind === k).map((o) => o.label);
+  return {
+    countries: co.data.map((c) => c.name),
+    cities: ci.data,
+    genders: kind("gender"),
+    goals: kind("goal"),
+    assets: Object.fromEntries(as.data.map((a) => [a.key, a.url])),
+    settings: Object.fromEntries(st.data.map((a) => [a.key, a.value])),
+  };
+}

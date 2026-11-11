@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { GAME, HOME_BG } from "./config.js";
+import useMeta from "./useMeta.js";
 import { GoogleG } from "./icons.jsx";
 
 export default function Title({ user, busy, error, onLogin, onStart, onLogout }) {
@@ -8,21 +8,23 @@ export default function Title({ user, busy, error, onLogin, onStart, onLogout })
     []
   );
   const name = user?.name || "Player";
+  const meta = useMeta();
+  const S = (meta && meta.settings) || {};
 
   return (
-    <div className="screen title" style={{ backgroundImage: `url(${HOME_BG})` }}>
+    <div className="screen title" style={meta && meta.assets.title_bg ? { backgroundImage: `url(${meta.assets.title_bg})` } : undefined}>
       <div className="shade" /><div className="vig" />
       <div className="particles">
         {parts.map((p, i) => (
           <i key={i} style={{ left: p.l + "%", animationDuration: p.d + "s", animationDelay: p.dl + "s", width: p.s, height: p.s }} />
         ))}
       </div>
-      <div className="corner-top">v{GAME.version}</div>
+      <div className="corner-top">{S.version ? "v" + S.version : ""}</div>
 
       <div className="logo">
-        <div className="game-type">{GAME.type}</div>
-        <h1>{GAME.name}</h1>
-        <div className="tag"><b>—</b> {GAME.tag}</div>
+        <div className="game-type">{S.type}</div>
+        <h1>{S.name}</h1>
+        <div className="tag"><b>—</b> {S.tag}</div>
       </div>
 
       <div className="login-box">
@@ -46,8 +48,8 @@ export default function Title({ user, busy, error, onLogin, onStart, onLogout })
       </div>
 
       <div className="footer">
-        <div>© 2026 <b>{GAME.producer}</b></div>
-        <div>Powered by <b className="xmb">{GAME.powered}</b></div>
+        <div>© {new Date().getFullYear()} <b>{S.producer}</b></div>
+        <div>Powered by <b className="xmb">{S.powered}</b></div>
       </div>
     </div>
   );
