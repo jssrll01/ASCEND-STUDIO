@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { loadMeta } from "./api.js";
 
-const KEY = "asc_meta_v1";
+const KEY = "asc_meta_v2";
 let cache = null;
 try { cache = JSON.parse(localStorage.getItem(KEY)); } catch (e) { cache = null; }
 const subs = new Set();
