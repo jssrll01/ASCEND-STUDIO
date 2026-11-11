@@ -67,3 +67,8 @@ html{background:#000}
 #root{max-width:480px;margin:0 auto;min-height:100%;position:relative;overflow-x:hidden}
 .chat{max-width:480px}
 .modal{max-width:480px;margin:0 auto}
+html,body,#root{width:100%;height:100%;max-width:none;margin:0;overflow-x:hidden}
+#root{max-width:none;position:static}
+.chat{position:fixed;inset:0;width:100%;max-width:none;height:100dvh;margin:0;border:0}
+.modal{max-width:none;margin:0}
+.count{right:96px}
