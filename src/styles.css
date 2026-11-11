@@ -63,3 +63,7 @@ input:focus,select:focus{outline:none;border-color:var(--red)}
 .dd-list li{padding:12px;font-size:16px;color:var(--text);letter-spacing:normal;border-bottom:1px solid var(--line);cursor:pointer}
 .dd-list li:last-child{border-bottom:0}
 .dd-list li:hover,.dd-list li.sel{background:var(--red);color:#fff}
+html{background:#000}
+#root{max-width:480px;margin:0 auto;min-height:100%;position:relative;overflow-x:hidden}
+.chat{max-width:480px}
+.modal{max-width:480px;margin:0 auto}
